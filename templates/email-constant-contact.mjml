@@ -1,0 +1,65 @@
+<mjml>
+  <mj-head>
+    <mj-title>JENGAI — [Email Subject]</mj-title>
+    <mj-preview>[Preview text — concrete value, under 90 characters]</mj-preview>
+    <mj-font name="Inter" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <mj-attributes>
+      <mj-all font-family="Inter, Arial, Helvetica, sans-serif" />
+      <mj-text font-size="14px" line-height="1.5" color="#18181f" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f8f8f9">
+    <!-- Deep navy brand header band + lime spark divider (lime is spark only, never background) -->
+    <mj-section background-color="#020133" padding="20px 28px">
+      <mj-column>
+        <mj-text color="#fefefe" font-size="22px" font-weight="600" letter-spacing="1px" padding="0">
+          JENGAI
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#d0ffa3" padding="2px 0">
+      <mj-column><mj-spacer height="2px" /></mj-column>
+    </mj-section>
+
+    <!-- Main body card -->
+    <mj-section background-color="#fefefe" padding="32px 28px">
+      <mj-column>
+        <mj-text font-size="20px" font-weight="600" color="#020133" line-height="1.3" padding-bottom="16px">
+          [Sentence-case headline — concrete benefit or story hook]
+        </mj-text>
+        <mj-text padding-bottom="12px">
+          [Opening paragraph: concrete pain point or named non-competitor growth story. Complete sentences, plain contractor language.]
+        </mj-text>
+        <mj-text padding-bottom="12px">
+          [Middle paragraph: connect the problem to how JENGAI helps commercial specialty subcontractors protect margins, free sales capacity, or see the pipeline clearly.]
+        </mj-text>
+        <mj-text padding-bottom="24px">
+          [Approved proof point from approved-messaging.md, such as Bonitz achieving 40% faster takeoff turnaround through Automated Plan Analysis (APA).]
+        </mj-text>
+        <mj-button
+          background-color="#000180"
+          color="#fefefe"
+          font-size="14px"
+          font-weight="500"
+          border-radius="48px"
+          inner-padding="12px 28px"
+          align="left"
+          href="https://www.jengai.com/demo"
+        >
+          Book a demo
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
+    <!-- Muted footer -->
+    <mj-section background-color="#f8f8f9" padding="20px 28px">
+      <mj-column>
+        <mj-divider border-color="#edeef1" border-width="1px" padding-bottom="16px" />
+        <mj-text font-size="12px" color="#67697f" line-height="1.5">
+          JENGAI — Pricing and operations platform for commercial specialty contractors.<br />
+          [Company physical mailing address] · <a href="{{unsubscribe_url}}" style="color:#2563eb;">Unsubscribe</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

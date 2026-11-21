@@ -1,485 +1,314 @@
 #!/usr/bin/env python3
 """
-Marketing Report PDF Generator — AI Marketing Claude Code Skills
-Generates professional, client-ready PDF marketing reports with charts,
-score visualizations, and prioritized action plans.
+JENGAI Marketing Report PDF Generator — Branded with JENGAI Design System v2.
+
+Enforces:
+- Visual brand guide tokens (#020133 deep header, #000180 primary blue,
+  #d0ffa3 lime accent spark only — never background, #18181f ink, #67697f muted,
+  #edeef1 hairline borders, sentence case headings, US MM/DD/YYYY dates).
+- Generated binary rules (core-brain/how-we-work/ai-conventions/generated-binary-rules.md):
+  When --sharepoint is supplied, writes the PDF directly to AI_Marketing_Outputs/...
+  and writes a tracked <basename>.sharepoint.md stub next to the source path.
 
 Requires: reportlab (pip install reportlab)
 """
 
-import sys
+from __future__ import annotations
+
+import argparse
 import json
 import os
+import sys
 from datetime import datetime
+from pathlib import Path
 
 try:
+    from reportlab.graphics.shapes import Circle, Drawing, Line, Rect, String
+    from reportlab.lib.colors import HexColor, white
     from reportlab.lib.pagesizes import letter
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
     from reportlab.lib.units import inch
-    from reportlab.lib.colors import HexColor, white, black
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Table,
-                                     TableStyle, PageBreak, Image)
-    from reportlab.graphics.shapes import Drawing, Rect, Circle, String, Line, Wedge
-    from reportlab.graphics.charts.barcharts import VerticalBarChart
-    from reportlab.graphics import renderPDF
+    from reportlab.platypus import PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+    REPORTLAB_AVAILABLE = True
 except ImportError:
-    print("Error: reportlab is required. Install with: pip install reportlab")
-    sys.exit(1)
+    REPORTLAB_AVAILABLE = False
 
 
-# Color palette
-COLORS = {
-    "primary": HexColor("#1B2A4A"),
-    "accent": HexColor("#2D5BFF"),
-    "highlight": HexColor("#FF6B35"),
-    "success": HexColor("#00C853"),
-    "warning": HexColor("#FFB300"),
-    "danger": HexColor("#FF1744"),
-    "light_bg": HexColor("#F5F7FA"),
-    "text": HexColor("#2C3E50"),
-    "text_light": HexColor("#7F8C9B"),
-    "border": HexColor("#E0E6ED"),
-    "white": white,
-    "black": black,
-}
+# JENGAI Design System v2 semantic palette
+if REPORTLAB_AVAILABLE:
+    COLORS = {
+        "header_deep": HexColor("#020133"),   # surface/header
+        "primary": HexColor("#000180"),       # brand/primary
+        "blue_600": HexColor("#1718b9"),      # chart primary
+        "lime_spark": HexColor("#d0ffa3"),    # brand/success accent (spark only, never full bg)
+        "success": HexColor("#3b9719"),       # lime/800 readable status
+        "warning": HexColor("#fe8201"),       # status/warning
+        "danger": HexColor("#fb281c"),        # status/error
+        "light_bg": HexColor("#f8f8f9"),      # neutral/100
+        "text": HexColor("#18181f"),          # text/strong
+        "text_muted": HexColor("#67697f"),    # text/muted
+        "border": HexColor("#edeef1"),        # input/border hairline
+        "white": white,
+    }
 
 
-def score_color(score):
-    """Return color based on score value."""
+def score_color(score: float):
     if score >= 80:
         return COLORS["success"]
-    elif score >= 60:
-        return COLORS["accent"]
-    elif score >= 40:
+    if score >= 60:
+        return COLORS["blue_600"]
+    if score >= 40:
         return COLORS["warning"]
-    else:
-        return COLORS["danger"]
+    return COLORS["danger"]
 
 
-def draw_score_gauge(score, x, y, size=80):
-    """Create a circular score gauge drawing."""
-    d = Drawing(size + 20, size + 30)
+def build_competitor_table_rows(data: dict) -> list[list[str]]:
+    """Build competitor comparison rows using target_comparison fields (fixes repeated brand_name bug)."""
+    brand = data.get("brand_name", "JENGAI")
+    competitors = (data.get("competitors") or [])[:3]
+    target_comp = data.get("target_comparison") or {}
 
-    # Background circle
-    d.add(Circle(size / 2 + 10, size / 2 + 15, size / 2,
-                 fillColor=COLORS["light_bg"], strokeColor=COLORS["border"], strokeWidth=2))
+    header = ["Dimension", brand] + [c.get("name", f"Competitor {i + 1}") for i, c in enumerate(competitors)]
+    rows = [header]
+    dimensions = [
+        ("Positioning", "positioning"),
+        ("Pricing", "pricing"),
+        ("Social proof", "social_proof"),
+        ("Content", "content"),
+    ]
+    for label, key in dimensions:
+        row = [label, str(target_comp.get(key, "—"))]
+        for comp in competitors:
+            row.append(str(comp.get(key, "—")))
+        rows.append(row)
+    return rows
 
-    # Score arc (simplified as colored inner circle)
-    color = score_color(score)
-    inner_r = size / 2 - 8
-    d.add(Circle(size / 2 + 10, size / 2 + 15, inner_r,
-                 fillColor=color, strokeColor=None))
 
-    # White center
-    d.add(Circle(size / 2 + 10, size / 2 + 15, inner_r - 10,
-                 fillColor=COLORS["white"], strokeColor=None))
+def resolve_sharepoint_marketing_dir() -> Path | None:
+    """Locate core-brain/scripts/sharepoint_path.py and resolve AI_Marketing_Outputs."""
+    candidates = []
+    env_brain = os.environ.get("JENGAI_GTM_BRAIN")
+    if env_brain:
+        candidates.append(Path(env_brain) / "core-brain" / "scripts")
+    here = Path(__file__).resolve()
+    for parent in [here.parent, *here.parents]:
+        candidates.append(parent / "core-brain" / "scripts")
+        candidates.append(parent / "jengai-corp" / "gtm-brain" / "core-brain" / "scripts")
+        candidates.append(parent / "gtm-brain" / "core-brain" / "scripts")
 
-    # Score text
-    d.add(String(size / 2 + 10, size / 2 + 10, str(int(score)),
-                 fontSize=20, fillColor=COLORS["primary"],
-                 textAnchor="middle", fontName="Helvetica-Bold"))
+    for script_dir in candidates:
+        if (script_dir / "sharepoint_path.py").is_file():
+            sys.path.insert(0, str(script_dir))
+            try:
+                import sharepoint_path  # type: ignore
+                return sharepoint_path.outputs_dir("marketing", init=True)
+            except Exception:
+                return None
+    return None
 
+
+def draw_score_gauge(score: float, size: int = 96):
+    d = Drawing(size + 24, size + 24)
+    cx = size / 2 + 12
+    cy = size / 2 + 12
+    d.add(Circle(cx, cy, size / 2, fillColor=COLORS["light_bg"], strokeColor=COLORS["border"], strokeWidth=2))
+    d.add(Circle(cx, cy, size / 2 - 7, fillColor=score_color(score), strokeColor=None))
+    d.add(Circle(cx, cy, size / 2 - 17, fillColor=COLORS["white"], strokeColor=None))
+    d.add(String(cx, cy - 7, str(int(round(score))), fontSize=22, fillColor=COLORS["header_deep"], textAnchor="middle", fontName="Helvetica-Bold"))
     return d
 
 
-def create_bar_chart(categories, scores, width=450, height=180):
-    """Create a horizontal bar chart for category scores."""
+def create_bar_chart(categories: list[str], scores: list[float], width: int = 470, height: int = 185):
     d = Drawing(width, height)
+    bar_h = 18
+    gap = 10
+    label_w = 170
+    max_bar_w = width - label_w - 45
+    start_y = height - 24
 
-    bar_height = 20
-    gap = 8
-    max_bar_width = width - 180
-    start_y = height - 30
-    label_x = 5
-    bar_x = 160
-
-    for i, (cat, score) in enumerate(zip(categories, scores)):
-        y = start_y - i * (bar_height + gap)
-
-        # Category label
-        d.add(String(label_x, y + 5, cat[:22],
-                     fontSize=9, fillColor=COLORS["text"],
-                     textAnchor="start", fontName="Helvetica"))
-
-        # Background bar
-        d.add(Rect(bar_x, y, max_bar_width, bar_height,
-                   fillColor=COLORS["light_bg"], strokeColor=None))
-
-        # Score bar
-        bar_width = (score / 100) * max_bar_width
-        color = score_color(score)
-        d.add(Rect(bar_x, y, bar_width, bar_height,
-                   fillColor=color, strokeColor=None))
-
-        # Score label
-        d.add(String(bar_x + max_bar_width + 10, y + 5, f"{int(score)}",
-                     fontSize=10, fillColor=COLORS["text"],
-                     textAnchor="start", fontName="Helvetica-Bold"))
-
+    for i, (cat, sc) in enumerate(zip(categories, scores)):
+        y = start_y - i * (bar_h + gap)
+        d.add(String(0, y + 5, cat[:26], fontSize=9, fillColor=COLORS["text"], fontName="Helvetica"))
+        d.add(Rect(label_w, y, max_bar_w, bar_h, fillColor=COLORS["light_bg"], strokeColor=None))
+        bar_w = max(0, min(100, sc)) / 100.0 * max_bar_w
+        d.add(Rect(label_w, y, bar_w, bar_h, fillColor=score_color(sc), strokeColor=None))
+        d.add(String(label_w + max_bar_w + 10, y + 5, f"{int(round(sc))}/100", fontSize=9, fillColor=COLORS["text"], fontName="Helvetica-Bold"))
     return d
 
 
-def generate_report(data, output_path):
-    """Generate a professional marketing PDF report."""
-    doc = SimpleDocTemplate(
-        output_path,
-        pagesize=letter,
-        rightMargin=50,
-        leftMargin=50,
-        topMargin=50,
-        bottomMargin=50
-    )
+def generate_report(data: dict, output_path: str | Path) -> Path:
+    if not REPORTLAB_AVAILABLE:
+        raise RuntimeError("reportlab is required. Install with: pip install reportlab")
 
+    out = Path(output_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+
+    doc = SimpleDocTemplate(
+        str(out),
+        pagesize=letter,
+        rightMargin=48,
+        leftMargin=48,
+        topMargin=48,
+        bottomMargin=48,
+    )
     styles = getSampleStyleSheet()
 
-    # Custom styles
-    title_style = ParagraphStyle(
-        "CustomTitle",
-        parent=styles["Title"],
-        fontSize=28,
-        textColor=COLORS["primary"],
-        spaceAfter=6,
-        fontName="Helvetica-Bold"
-    )
+    title_style = ParagraphStyle("JTitle", parent=styles["Title"], fontSize=24, textColor=COLORS["header_deep"], spaceAfter=6, fontName="Helvetica-Bold", alignment=0)
+    subtitle_style = ParagraphStyle("JSub", parent=styles["Normal"], fontSize=11, textColor=COLORS["text_muted"], spaceAfter=6, fontName="Helvetica")
+    h1_style = ParagraphStyle("JH1", parent=styles["Heading1"], fontSize=16, textColor=COLORS["header_deep"], spaceBefore=16, spaceAfter=8, fontName="Helvetica-Bold")
+    h2_style = ParagraphStyle("JH2", parent=styles["Heading2"], fontSize=12, textColor=COLORS["primary"], spaceBefore=12, spaceAfter=6, fontName="Helvetica-Bold")
+    body_style = ParagraphStyle("JBody", parent=styles["Normal"], fontSize=10, textColor=COLORS["text"], spaceAfter=6, fontName="Helvetica", leading=14)
 
-    subtitle_style = ParagraphStyle(
-        "CustomSubtitle",
-        parent=styles["Normal"],
-        fontSize=14,
-        textColor=COLORS["text_light"],
-        spaceAfter=20,
-        fontName="Helvetica"
-    )
-
-    heading_style = ParagraphStyle(
-        "CustomHeading",
-        parent=styles["Heading1"],
-        fontSize=18,
-        textColor=COLORS["primary"],
-        spaceBefore=20,
-        spaceAfter=10,
-        fontName="Helvetica-Bold"
-    )
-
-    subheading_style = ParagraphStyle(
-        "CustomSubheading",
-        parent=styles["Heading2"],
-        fontSize=14,
-        textColor=COLORS["accent"],
-        spaceBefore=14,
-        spaceAfter=8,
-        fontName="Helvetica-Bold"
-    )
-
-    body_style = ParagraphStyle(
-        "CustomBody",
-        parent=styles["Normal"],
-        fontSize=10,
-        textColor=COLORS["text"],
-        spaceAfter=6,
-        fontName="Helvetica",
-        leading=14
-    )
-
-    # Build document elements
     elements = []
 
-    # === COVER PAGE ===
-    elements.append(Spacer(1, 1.5 * inch))
-    elements.append(Paragraph("Marketing Audit Report", title_style))
+    # Cover header band (JENGAI deep navy + lime spark line)
+    band = Drawing(516, 52)
+    band.add(Rect(0, 4, 516, 48, fillColor=COLORS["header_deep"], strokeColor=None))
+    band.add(Rect(0, 0, 516, 4, fillColor=COLORS["lime_spark"], strokeColor=None))
+    band.add(String(16, 22, "JENGAI", fontSize=18, fillColor=COLORS["white"], fontName="Helvetica-Bold"))
+    band.add(String(500, 24, "Internal marketing report", fontSize=9, fillColor=COLORS["lime_spark"], fontName="Helvetica", textAnchor="end"))
+    elements.append(band)
+    elements.append(Spacer(1, 0.4 * inch))
 
-    url = data.get("url", "example.com")
-    date_str = data.get("date", datetime.now().strftime("%B %d, %Y"))
-    elements.append(Paragraph(f"{url}", subtitle_style))
-    elements.append(Paragraph(f"Generated: {date_str}", subtitle_style))
-    elements.append(Spacer(1, 0.5 * inch))
+    elements.append(Paragraph("Marketing audit report", title_style))
+    url = data.get("url", "https://www.jengai.com")
+    date_str = data.get("date", datetime.now().strftime("%m/%d/%Y"))
+    elements.append(Paragraph(f"Target: {url}", subtitle_style))
+    elements.append(Paragraph(f"Report date: {date_str}", subtitle_style))
+    elements.append(Spacer(1, 0.25 * inch))
 
-    # Overall score gauge
-    overall_score = data.get("overall_score", 0)
-    gauge = draw_score_gauge(overall_score, 0, 0, size=100)
-    elements.append(gauge)
-    elements.append(Spacer(1, 0.3 * inch))
+    overall_score = float(data.get("overall_score", 0))
+    elements.append(draw_score_gauge(overall_score))
+    elements.append(Spacer(1, 0.15 * inch))
 
-    grade = "A+" if overall_score >= 90 else "A" if overall_score >= 80 else "B" if overall_score >= 70 else "C" if overall_score >= 60 else "D" if overall_score >= 50 else "F"
-    elements.append(Paragraph(f"Overall Marketing Score: {int(overall_score)}/100 (Grade: {grade})", heading_style))
-
-    exec_summary = data.get("executive_summary", "This report provides a comprehensive analysis of the website's marketing effectiveness across content, conversion, SEO, competitive positioning, brand trust, and growth strategy.")
-    elements.append(Paragraph(exec_summary, body_style))
-
+    grade = "A" if overall_score >= 85 else "B" if overall_score >= 70 else "C" if overall_score >= 55 else "D" if overall_score >= 40 else "F"
+    elements.append(Paragraph(f"Overall marketing score: {int(round(overall_score))}/100 (Grade {grade})", h1_style))
+    elements.append(Paragraph(data.get("executive_summary", "Executive summary pending audit data."), body_style))
     elements.append(PageBreak())
 
-    # === SCORE BREAKDOWN ===
-    elements.append(Paragraph("Score Breakdown", heading_style))
-
-    categories = data.get("categories", {})
-    cat_names = list(categories.keys()) if categories else [
-        "Content & Messaging", "Conversion Optimization", "SEO & Discoverability",
-        "Competitive Positioning", "Brand & Trust", "Growth & Strategy"
-    ]
-    cat_scores = [categories.get(c, {}).get("score", 50) for c in cat_names] if categories else [65, 58, 72, 55, 68, 60]
-
-    # Bar chart
-    chart = create_bar_chart(cat_names, cat_scores)
-    elements.append(chart)
-    elements.append(Spacer(1, 0.3 * inch))
-
-    # Score table
-    score_data = [["Category", "Score", "Weight", "Status"]]
-    weights = ["25%", "20%", "20%", "15%", "10%", "10%"]
-    for i, (name, score) in enumerate(zip(cat_names, cat_scores)):
-        status = "Strong" if score >= 75 else "Needs Work" if score >= 50 else "Critical"
-        weight = weights[i] if i < len(weights) else "—"
-        score_data.append([name, f"{int(score)}/100", weight, status])
-
-    score_table = Table(score_data, colWidths=[180, 70, 60, 90])
-    score_table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), COLORS["primary"]),
-        ("TEXTCOLOR", (0, 0), (-1, 0), COLORS["white"]),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, -1), 9),
-        ("ALIGN", (1, 0), (-1, -1), "CENTER"),
-        ("GRID", (0, 0), (-1, -1), 0.5, COLORS["border"]),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLORS["white"], COLORS["light_bg"]]),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-    ]))
-    elements.append(score_table)
-
+    # Score breakdown
+    elements.append(Paragraph("Score breakdown", h1_style))
+    categories = data.get("categories") or {}
+    cat_names = list(categories.keys())
+    cat_scores = [float(categories[c].get("score", 0)) for c in cat_names]
+    if cat_names:
+        elements.append(create_bar_chart(cat_names, cat_scores))
+        elements.append(Spacer(1, 0.2 * inch))
+        rows = [["Category", "Score", "Weight", "Status"]]
+        for c, sc in zip(cat_names, cat_scores):
+            status = "Strong" if sc >= 75 else "Needs work" if sc >= 50 else "Critical"
+            rows.append([c, f"{int(round(sc))}/100", str(categories[c].get("weight", "—")), status])
+        tbl = Table(rows, colWidths=[210, 80, 70, 110])
+        tbl.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), COLORS["header_deep"]),
+            ("TEXTCOLOR", (0, 0), (-1, 0), COLORS["white"]),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -1), 9),
+            ("GRID", (0, 0), (-1, -1), 0.5, COLORS["border"]),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLORS["white"], COLORS["light_bg"]]),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+        ]))
+        elements.append(tbl)
     elements.append(PageBreak())
 
-    # === KEY FINDINGS ===
-    elements.append(Paragraph("Key Findings", heading_style))
-
-    findings = data.get("findings", [])
-    if not findings:
-        findings = [
-            {"severity": "Critical", "finding": "Homepage headline lacks clarity — visitors can't understand the value proposition in under 5 seconds"},
-            {"severity": "High", "finding": "No social proof on homepage — missing testimonials, client logos, and trust badges"},
-            {"severity": "High", "finding": "Primary CTA uses generic text ('Get Started') instead of value-driven copy"},
-            {"severity": "Medium", "finding": "Missing meta descriptions on key landing pages"},
-            {"severity": "Medium", "finding": "No email capture mechanism or lead magnet visible"},
-            {"severity": "Low", "finding": "Blog content lacks internal linking to product pages"},
+    # Findings
+    elements.append(Paragraph("Key findings", h1_style))
+    findings = data.get("findings") or []
+    if findings:
+        f_rows = [["Severity", "Finding"]]
+        for f in findings:
+            f_rows.append([f.get("severity", "Medium"), Paragraph(str(f.get("finding", "")), body_style)])
+        f_tbl = Table(f_rows, colWidths=[80, 420])
+        cmds = [
+            ("BACKGROUND", (0, 0), (-1, 0), COLORS["header_deep"]),
+            ("TEXTCOLOR", (0, 0), (-1, 0), COLORS["white"]),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -1), 9),
+            ("GRID", (0, 0), (-1, -1), 0.5, COLORS["border"]),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("TOPPADDING", (0, 0), (-1, -1), 6),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
         ]
+        sev_map = {"Critical": COLORS["danger"], "High": COLORS["warning"], "Medium": COLORS["blue_600"], "Low": COLORS["text_muted"]}
+        for idx, f in enumerate(findings, 1):
+            cmds.append(("TEXTCOLOR", (0, idx), (0, idx), sev_map.get(f.get("severity", "Medium"), COLORS["text"])))
+            cmds.append(("FONTNAME", (0, idx), (0, idx), "Helvetica-Bold"))
+        f_tbl.setStyle(TableStyle(cmds))
+        elements.append(f_tbl)
 
-    findings_data = [["Severity", "Finding"]]
-    for f in findings:
-        severity = f.get("severity", "Medium")
-        finding = f.get("finding", "")
-        findings_data.append([severity, Paragraph(finding, body_style)])
+    # Action plan
+    elements.append(Spacer(1, 0.25 * inch))
+    elements.append(Paragraph("Prioritized action plan", h1_style))
+    for heading, key in (
+        ("Quick wins (this week)", "quick_wins"),
+        ("Medium-term (this month)", "medium_term"),
+        ("Strategic (this quarter)", "strategic"),
+    ):
+        items = data.get(key) or []
+        if items:
+            elements.append(Paragraph(heading, h2_style))
+            for i, item in enumerate(items, 1):
+                elements.append(Paragraph(f"{i}. {item}", body_style))
 
-    findings_table = Table(findings_data, colWidths=[70, 400])
-    severity_colors = {
-        "Critical": COLORS["danger"],
-        "High": COLORS["highlight"],
-        "Medium": COLORS["warning"],
-        "Low": COLORS["accent"]
-    }
-    table_style_cmds = [
-        ("BACKGROUND", (0, 0), (-1, 0), COLORS["primary"]),
-        ("TEXTCOLOR", (0, 0), (-1, 0), COLORS["white"]),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, -1), 9),
-        ("GRID", (0, 0), (-1, -1), 0.5, COLORS["border"]),
-        ("VALIGN", (0, 0), (-1, -1), "TOP"),
-        ("TOPPADDING", (0, 0), (-1, -1), 6),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
-        ("ALIGN", (0, 0), (0, -1), "CENTER"),
-    ]
-    for i, f in enumerate(findings, 1):
-        color = severity_colors.get(f.get("severity", "Medium"), COLORS["warning"])
-        table_style_cmds.append(("TEXTCOLOR", (0, i), (0, i), color))
-        table_style_cmds.append(("FONTNAME", (0, i), (0, i), "Helvetica-Bold"))
-
-    findings_table.setStyle(TableStyle(table_style_cmds))
-    elements.append(findings_table)
-
-    elements.append(PageBreak())
-
-    # === ACTION PLAN ===
-    elements.append(Paragraph("Prioritized Action Plan", heading_style))
-
-    # Quick Wins
-    elements.append(Paragraph("Quick Wins (This Week)", subheading_style))
-    quick_wins = data.get("quick_wins", [
-        "Rewrite homepage headline to be specific and benefit-driven",
-        "Add 3-5 client logos or trust badges above the fold",
-        "Change primary CTA to value-driven text (e.g., 'Start Free Trial — No Credit Card')",
-        "Add meta descriptions to top 5 landing pages",
-    ])
-    for i, win in enumerate(quick_wins, 1):
-        elements.append(Paragraph(f"{i}. {win}", body_style))
-
-    elements.append(Spacer(1, 0.2 * inch))
-
-    # Medium-Term
-    elements.append(Paragraph("Medium-Term (1-3 Months)", subheading_style))
-    medium_term = data.get("medium_term", [
-        "Build email capture funnel with lead magnet",
-        "Create comparison pages for top 3 competitors",
-        "Develop 3 case studies with measurable results",
-        "Implement blog content strategy targeting high-intent keywords",
-    ])
-    for i, action in enumerate(medium_term, 1):
-        elements.append(Paragraph(f"{i}. {action}", body_style))
-
-    elements.append(Spacer(1, 0.2 * inch))
-
-    # Strategic
-    elements.append(Paragraph("Strategic (3-6 Months)", subheading_style))
-    strategic = data.get("strategic", [
-        "Launch referral program with incentive structure",
-        "Build content authority hub with pillar content",
-        "Implement full-funnel retargeting campaign",
-        "Develop pricing optimization based on value metrics",
-    ])
-    for i, action in enumerate(strategic, 1):
-        elements.append(Paragraph(f"{i}. {action}", body_style))
-
-    elements.append(PageBreak())
-
-    # === COMPETITOR SNAPSHOT ===
+    # Competitor landscape
     if data.get("competitors"):
-        elements.append(Paragraph("Competitive Landscape", heading_style))
-
-        comp_data = [["", data.get("brand_name", "Target")] + [c.get("name", f"Competitor {i+1}") for i, c in enumerate(data["competitors"][:3])]]
-        comp_rows = ["Positioning", "Pricing", "Social Proof", "Content"]
-
-        for row_name in comp_rows:
-            row = [row_name, data.get("brand_name", "Target")]
-            for comp in data["competitors"][:3]:
-                row.append(comp.get(row_name.lower().replace(" ", "_"), "—"))
-            # Ensure consistent columns
-            while len(row) < len(comp_data[0]):
-                row.append("—")
-            comp_data.append(row)
-
-        col_count = len(comp_data[0])
-        col_width = 470 / col_count
-        comp_table = Table(comp_data, colWidths=[col_width] * col_count)
-        comp_table.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), COLORS["primary"]),
+        elements.append(PageBreak())
+        elements.append(Paragraph("Competitive landscape", h1_style))
+        comp_rows = build_competitor_table_rows(data)
+        col_w = 500 / len(comp_rows[0])
+        wrapped = [[Paragraph(cell, body_style) if r_i > 0 else cell for cell in row] for r_i, row in enumerate(comp_rows)]
+        c_tbl = Table(wrapped, colWidths=[col_w] * len(comp_rows[0]))
+        c_tbl.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), COLORS["header_deep"]),
             ("TEXTCOLOR", (0, 0), (-1, 0), COLORS["white"]),
             ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
             ("FONTSIZE", (0, 0), (-1, -1), 8),
             ("GRID", (0, 0), (-1, -1), 0.5, COLORS["border"]),
             ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLORS["white"], COLORS["light_bg"]]),
-            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
             ("TOPPADDING", (0, 0), (-1, -1), 5),
             ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-            ("FONTNAME", (0, 1), (0, -1), "Helvetica-Bold"),
         ]))
-        elements.append(comp_table)
-        elements.append(PageBreak())
+        elements.append(c_tbl)
 
-    # === METHODOLOGY ===
-    elements.append(Paragraph("Methodology", heading_style))
-    elements.append(Paragraph(
-        "This audit evaluates six key dimensions of marketing effectiveness. "
-        "Each category is scored 0-100 based on industry best practices and competitive benchmarks.",
-        body_style
-    ))
+    elements.append(Spacer(1, 0.4 * inch))
+    elements.append(Paragraph("Generated by JENGAI AI Marketing Team — internal draft, not for external distribution without approval.", ParagraphStyle("JFooter", parent=body_style, fontSize=8, textColor=COLORS["text_muted"])))
 
-    method_data = [
-        ["Category", "Weight", "What We Measure"],
-        ["Content & Messaging", "25%", "Copy quality, value proposition clarity, CTA effectiveness"],
-        ["Conversion Optimization", "20%", "Funnel design, forms, social proof, friction reduction"],
-        ["SEO & Discoverability", "20%", "On-page SEO, technical SEO, content structure"],
-        ["Competitive Positioning", "15%", "Market differentiation, pricing, alternatives strategy"],
-        ["Brand & Trust", "10%", "Design quality, trust signals, authority indicators"],
-        ["Growth & Strategy", "10%", "Pricing strategy, acquisition channels, retention"],
-    ]
-
-    method_table = Table(method_data, colWidths=[140, 50, 280])
-    method_table.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), COLORS["primary"]),
-        ("TEXTCOLOR", (0, 0), (-1, 0), COLORS["white"]),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, -1), 9),
-        ("GRID", (0, 0), (-1, -1), 0.5, COLORS["border"]),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLORS["white"], COLORS["light_bg"]]),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-    ]))
-    elements.append(method_table)
-
-    elements.append(Spacer(1, 0.5 * inch))
-    elements.append(Paragraph(
-        "Generated by AI Marketing Suite for Claude Code",
-        ParagraphStyle("Footer", parent=body_style, fontSize=8, textColor=COLORS["text_light"])
-    ))
-
-    # Build PDF
     doc.build(elements)
-    return output_path
+    return out
 
 
 def main():
-    if len(sys.argv) < 2:
-        # Demo mode — generate sample report
-        sample_data = {
-            "url": "https://example.com",
-            "date": datetime.now().strftime("%B %d, %Y"),
-            "overall_score": 62,
-            "executive_summary": "This marketing audit reveals several high-impact opportunities to improve conversion rates and strengthen competitive positioning. The website has solid content foundations but is underperforming in conversion optimization and competitive awareness.",
-            "categories": {
-                "Content & Messaging": {"score": 68, "weight": "25%"},
-                "Conversion Optimization": {"score": 52, "weight": "20%"},
-                "SEO & Discoverability": {"score": 74, "weight": "20%"},
-                "Competitive Positioning": {"score": 48, "weight": "15%"},
-                "Brand & Trust": {"score": 70, "weight": "10%"},
-                "Growth & Strategy": {"score": 55, "weight": "10%"},
-            },
-            "findings": [
-                {"severity": "Critical", "finding": "Homepage headline is generic — doesn't communicate specific value to target audience"},
-                {"severity": "Critical", "finding": "No social proof visible above the fold on the homepage"},
-                {"severity": "High", "finding": "Primary CTA button says 'Submit' — should use value-driven text"},
-                {"severity": "High", "finding": "Pricing page lacks comparison features and doesn't address objections"},
-                {"severity": "Medium", "finding": "Missing competitor comparison pages — losing high-intent search traffic"},
-                {"severity": "Medium", "finding": "Blog posts have no internal links to product pages"},
-                {"severity": "Low", "finding": "Social media links in footer but no social proof integration"},
-            ],
-            "quick_wins": [
-                "Rewrite homepage headline: 'We help businesses grow' → 'Get 3x more qualified leads in 30 days — without cold calling'",
-                "Add 5 client logos above the fold with 'Trusted by 500+ companies' text",
-                "Change form button from 'Submit' to 'Get My Free Marketing Audit'",
-                "Add testimonial section with name, photo, company, and specific results",
-            ],
-            "medium_term": [
-                "Build '[Competitor] Alternative' landing pages for top 3 competitors",
-                "Create 3 video case studies showing measurable client results",
-                "Implement exit-intent popup with lead magnet offer",
-                "Launch email nurture sequence for leads who don't convert immediately",
-            ],
-            "strategic": [
-                "Develop content authority hub with 10 pillar pages targeting high-volume keywords",
-                "Build referral program with double-sided incentives",
-                "Launch retargeting campaigns across Meta and Google with funnel-based messaging",
-                "Create free tool or assessment to capture leads at top of funnel",
-            ],
-            "competitors": [
-                {"name": "Comp A", "positioning": "All-in-one platform", "pricing": "$49-199/mo", "social_proof": "10K+ users", "content": "Active blog"},
-                {"name": "Comp B", "positioning": "Enterprise focus", "pricing": "Custom", "social_proof": "Fortune 500 logos", "content": "Whitepapers"},
-                {"name": "Comp C", "positioning": "Budget-friendly", "pricing": "Free-$29/mo", "social_proof": "4.8★ G2", "content": "YouTube channel"},
-            ],
-            "brand_name": "Example Co"
-        }
+    parser = argparse.ArgumentParser(description="Generate a JENGAI-branded marketing PDF report.")
+    parser.add_argument("input_json", help="Path to structured audit JSON input.")
+    parser.add_argument("output_pdf", nargs="?", default=None, help="Output PDF path (use /tmp or SharePoint; never inside a git repo).")
+    parser.add_argument("--sharepoint-rel", default=None, help="Relative path inside AI_Marketing_Outputs (writes directly to SharePoint).")
+    parser.add_argument("--stub-path", default=None, help="Optional repo path to write a <basename>.sharepoint.md breadcrumb stub.")
+    args = parser.parse_args()
 
-        output = "MARKETING-REPORT-sample.pdf"
-        generate_report(sample_data, output)
-        print(f"Sample report generated: {output}")
+    data = json.loads(Path(args.input_json).read_text(encoding="utf-8"))
+
+    if args.sharepoint_rel:
+        sp_root = resolve_sharepoint_marketing_dir()
+        if not sp_root:
+            print("Error: Could not resolve SharePoint AI_Marketing_Outputs folder. Ensure gtm-brain/core-brain is present and SharePoint is synced.", file=sys.stderr)
+            sys.exit(2)
+        target = sp_root / args.sharepoint_rel
+        generate_report(data, target)
+        if args.stub_path:
+            stub = Path(args.stub_path)
+            stub.parent.mkdir(parents=True, exist_ok=True)
+            stub.write_text(f"SharePoint: AI_Marketing_Outputs/{args.sharepoint_rel}\n", encoding="utf-8")
+        print(f"Report written to SharePoint: {target}")
         return
 
-    # JSON input mode
-    input_file = sys.argv[1]
-    output_file = sys.argv[2] if len(sys.argv) > 2 else "MARKETING-REPORT.pdf"
+    if not args.output_pdf:
+        print("Error: Provide either --sharepoint-rel or an explicit output_pdf path (outside git repos).", file=sys.stderr)
+        sys.exit(2)
 
-    with open(input_file, "r") as f:
-        data = json.load(f)
-
-    generate_report(data, output_file)
-    print(f"Report generated: {output_file}")
+    out = generate_report(data, args.output_pdf)
+    print(f"Report generated: {out}")
 
 
 if __name__ == "__main__":
