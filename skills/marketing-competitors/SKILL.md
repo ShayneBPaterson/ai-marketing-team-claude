@@ -9,7 +9,7 @@ Maintains JENGAI's canonical competitor tracker in `gtm-brain/marketing/knowledg
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `gtm-knowledge/competitive-intelligence.md`
 2. `marketing/knowledge/competitors/README.md` and `threat-assessment-matrix.md`
 3. `marketing/outputs/competitive/top-five-competitors.md`
@@ -30,7 +30,7 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 
 1. **Run compliance-aware scanner:**
    ```bash
-   python3 scripts/competitor_scanner.py --url <competitor-url> --output json
+   python3 <MKT_ROOT>/scripts/competitor_scanner.py --url <competitor-url> --output json
    ```
    (Respect `blocked_by_compliance` or `blocked_by_robots` outputs — never silently bypass.)
 2. **Research via web search & review sites (G2, Capterra, Reddit, vendor docs):**
@@ -40,9 +40,9 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 3. **Score the Competitor on JENGAI's Model:**
    - **Material Threat Rating (1–5):** `1/5` wrong buyer/trade, `2/5` adjacent watch, `3/5` partial overlap, `4/5` strong direct overlap, `5/5` head-on finish-trade rival.
    - **Threat Matrix Score (0–100) & Tier (`H` / `M` / `L`):** Consistent with `marketing/knowledge/competitors/threat-assessment-matrix.md`.
-4. **Produce Two Artifacts** using `templates/competitor-profile.md`:
+4. **Produce Two Artifacts** using `<MKT_ROOT>/templates/competitor-profile.md`:
    - Compact profile (`COMPETITOR-PROFILE-<slug>.md` — ready for `marketing/knowledge/competitors/<slug>.md`)
    - Full dated analysis + source ledger (`COMPETITOR-REPORT.md` — ready for `marketing/outputs/competitive/analyses/<slug>-competitive-analysis-YYYY-MM-DD.md`)
 5. **Include `gtm-brain` Propagation Checklist:** Remind the operator which tracker files to update (`README.md`, `threat-assessment-matrix.md`, `all-known-competitors.md`, `top-10-funded-competitors.md`, and `market-intelligence/*/sources.json` + Azure crawler pack if monitored).
 
-Run `python3 scripts/validate_copy.py COMPETITOR-REPORT.md --register internal`.
+Run `python3 <MKT_ROOT>/scripts/validate_copy.py COMPETITOR-REPORT.md --register internal`.

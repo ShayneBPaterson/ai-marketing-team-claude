@@ -51,6 +51,40 @@ class CompetitorScannerTests(unittest.TestCase):
         res = competitor_scanner.scan_competitor("https://www.enr.com/articles/123", registry={"enr.com": {"status": "excluded"}})
         self.assertEqual(res["status"], "blocked_by_compliance")
 
+    def test_loads_schema_v2_compliance_registry(self):
+        import json
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            tm_dir = root / "marketing" / "market-intelligence" / "threat-monitoring"
+            tm_dir.mkdir(parents=True)
+            (tm_dir / "sources.json").write_text(
+                json.dumps({
+                    "schema_version": 2,
+                    "sources": [
+                        {
+                            "name": "Cyncly Flooring",
+                            "status": "approved",
+                            "compliance_decision": "Owner-approved bounded collection.",
+                            "sources": [{"label": "Commercial", "url": "https://www.cyncly.com/en/industries/flooring/"}],
+                        },
+                        {
+                            "name": "Blocked Vendor",
+                            "status": "excluded",
+                            "compliance_decision": "Do not scrape.",
+                            "sources": [{"label": "Home", "url": "https://blockedvendor.example.com/"}],
+                        },
+                    ],
+                }),
+                encoding="utf-8",
+            )
+            reg = competitor_scanner.load_compliance_registry(root)
+            self.assertIn("cyncly.com", reg)
+            self.assertEqual(reg["cyncly.com"]["status"], "approved")
+            self.assertIn("blockedvendor.example.com", reg)
+            self.assertEqual(reg["blockedvendor.example.com"]["status"], "excluded")
+
     def test_parses_competitor_signals(self):
         html = """
         <html><head><title>Example Sub Tool</title></head>

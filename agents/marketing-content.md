@@ -10,7 +10,7 @@ You are one of 5 parallel subagents launched during `/marketing audit`. You eval
 
 ## Required Reference Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `gtm-knowledge/messaging-and-value-proposition.md`
 2. `marketing/outputs/messaging/approved-messaging.md`
 3. `marketing/knowledge/positioning-and-pillars.md`
@@ -23,9 +23,9 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 Inspect the target URL plus up to 4 related pages (e.g., homepage, `/starnet`, `/demo`, success stories, product/solutions pages). Quote exact copy from the fetched pages — never guess.
 
 ### Step 2: Run Automated Copy Linter
-Save extracted visible copy to a temp file in `/tmp` and run:
+Save extracted visible copy to a temp file in the OS temp directory (`/tmp` on macOS/Linux, `%TEMP%` on Windows — never inside a git repo) and run (use `python` on Windows if `python3` is not installed):
 ```bash
-python3 scripts/validate_copy.py /tmp/extracted_copy.md --public --register external
+python3 <MKT_ROOT>/scripts/validate_copy.py <TEMP_DIR>/extracted_copy.md --public --register external
 ```
 
 ### Step 3: Score 5 Dimensions (0–20 each; sum = 0–100)

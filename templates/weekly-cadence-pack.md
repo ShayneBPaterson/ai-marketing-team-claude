@@ -1,6 +1,6 @@
 # JENGAI Weekly Cadence Draft Pack — Week of [YYYY-MM-DD]
 
-- **Status:** DRAFT — awaiting Renata or Shayne approval (notify via Microsoft Teams)
+- **Status:** DRAFT — awaiting Renata (CMO) approval (+ Shayne sign-off if using Shayne founder voice; notify via Microsoft Teams)
 - **Calendar row:** [Quarter / Week #]
 - **Message pillar:** [Protect margins / Sell more / Pipeline visibility]
 - **Emotional button:** [Find work / Win more work / Make more money]
@@ -11,12 +11,12 @@
 
 ## 1. LinkedIn Post Draft
 
-- **Voice:** [Shayne founder voice / JENGAI company voice]
+- **Voice:** [JENGAI company voice / Renata CMO/Founder voice / Shayne founder voice]
 - **Recommended window:** Tue–Thu, 8:00–11:00 AM ET
 - **Framework:** [Problem -> Solution -> Proof / Before-After / Named Growth Story -> JENGAI Bridge]
 
 ```text
-[Write complete, connected sentences here. Open with a concrete number or named non-competitor growth story. End with a soft CTA such as linking to https://www.jengai.com/success-stories or inviting a demo.]
+[Write complete, connected sentences here. Open with a concrete number or named non-competitor growth story. End with a soft CTA inviting a demo at https://www.jengai.com/demo or linking to a verified live customer story URL — verify https://www.jengai.com/success-stories is restored from its 404 before linking it.]
 ```
 
 - **Hashtags (3 max):** `#CommercialFlooring #SpecialtyContractors #Preconstruction`
@@ -35,14 +35,15 @@
 [150-250 words in flowed paragraphs. One main idea, one clear CTA. Follow JENGAI voice and pre-publish checklist.]
 ```
 
-- **MJML file (optional):** Built from `templates/email-constant-contact.mjml`.
+- **MJML file (optional):** Built from `<MKT_ROOT>/templates/email-constant-contact.mjml`.
 
 ---
 
 ## 3. Pre-Publish Compliance Check
 
-- [ ] `python3 scripts/validate_copy.py <this-file> --public --register external` passed with 0 errors
+- [ ] `python3 <MKT_ROOT>/scripts/validate_copy.py <this-file> --public --register external` (or `python` on Windows) passed with 0 errors
 - [ ] Positioning lock respected (pricing and operations platform, never estimating or takeoff tool)
 - [ ] Only approved proof points used (exact wording, zero freelanced stats)
+- [ ] All links verified live (do not link to `/success-stories` until confirmed live after the 2026-11-21 404 audit)
 - [ ] Pre-publish checklist (`core-brain/how-we-work/ai-conventions/pre-publish-checklist.md`) reviewed out loud
-- [ ] Approved by Renata or Shayne before publishing or sending
+- [ ] Approved by Renata (CMO) before publishing or sending (+ Shayne sign-off for Shayne founder-voice posts)

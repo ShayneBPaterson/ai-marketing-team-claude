@@ -9,7 +9,7 @@ Maps, audits, and helps complete JENGAI's B2B funnel from top-of-funnel (TOFU) a
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `gtm-knowledge/funnel-stages-and-journey-maps.md`
 2. `gtm-knowledge/lead-definitions-and-qualification-criteria.md`
 3. `gtm-knowledge/icp.md` and `gtm-knowledge/pricing.md`
@@ -28,7 +28,7 @@ Website Entry (jengai.com · /starnet · /demo · /success-stories · Workshop R
 Lead Capture (HubSpot Forms API: /starnet or /demo form — contact + bids/mo, takeoff/pricing/ERP stack)
    │   [Open gap: GA4 form_submit event not yet wired]
    ▼
-Discovery Scheduling (Pre-filled Calendly: renata-jengai/jengai-discovery-call 30m or 1hour 45m)
+Discovery Scheduling (Pre-filled Calendly — verify current Sales/Marketing routing; website-tracking-and-embed-snippets.md lists renata-jengai/jengai-discovery-call 30m and 1hour 45m)
    │   [Open gap: GA4 calendly_booking event not yet wired]
    ▼
 Sales Qualification & Close (Sales-owned: Prospecting -> Discovery [Sandler Pain/Budget/Decision] -> Demo -> Proposal -> Negotiation -> Closed Won/Lost)
@@ -47,4 +47,4 @@ Sales Qualification & Close (Sales-owned: Prospecting -> Discovery [Sandler Pain
    - Explicit MQL criteria (ICP fit: \$4M+, commercial finish-trade sub, self-performs takeoff + engagement signal) vs. SQL criteria (Sandler Pain + Budget + Decision confirmed)
 4. **Prioritized Bottleneck Fixes:** Rank by impact and effort (Quick wins this week, Medium-term this month, Strategic this quarter).
 
-Save to `FUNNEL-ANALYSIS.md` (Internal Reports register) and run `python3 scripts/validate_copy.py FUNNEL-ANALYSIS.md --register internal`.
+Save to `FUNNEL-ANALYSIS.md` (Internal Reports register) and run `python3 <MKT_ROOT>/scripts/validate_copy.py FUNNEL-ANALYSIS.md --register internal`.

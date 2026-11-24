@@ -9,7 +9,7 @@ Directly powers JENGAI's proof-led campaigns ("Proof in Their Words", `marketing
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `marketing/outputs/messaging/approved-messaging.md` and `gtm-knowledge/messaging-and-value-proposition.md`
 2. `marketing/projects/2026-09-customer-case-studies/case-study-structure.md`
 3. `marketing/knowledge/website-success-stories/README.md`
@@ -27,13 +27,13 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 
 1. **Extract Evidence Ledger:** List every concrete fact from the source (company, city/state, trade, alliance membership like Starnet/FUSE/Commercial USA, interviewee name and title, before state, workflow change, verified quantified outcomes, verbatim quotes with timestamps if from video).
 2. **Map to JENGAI Pillars:** Link the story to the primary pillar (Protect margins, Sell more, or Pipeline visibility) and emotional button (Find work, Win more work, or Make more money).
-3. **Generate the 5-Asset Kit** using `templates/case-study-kit.md`:
+3. **Generate the 5-Asset Kit** using `<MKT_ROOT>/templates/case-study-kit.md`:
    - **Asset 1: Standalone `jengai.com/success-stories/<slug>` web page copy** (H1, 50–60 char title, 140–160 char meta description, Challenge → Approach → Results, verified pull-quotes, internal links to product pages, "Book a demo" CTA).
    - **Asset 2: Valid JSON-LD `Review` + `Article` schema snippet** ready for `jengai-com/public-website`.
    - **Asset 3: Sales-support 1-pager source** (markdown/HTML structured to `visual-brand-guide.md`; PDF export only via SharePoint).
    - **Asset 4: Distribution pair** — 1 LinkedIn post (Shayne founder voice or JENGAI brand voice) + 1 Constant Contact nurture email referencing the standalone URL.
    - **Asset 5: Proposed `approved-messaging.md` proof-point entry** (ready to merge once customer and Renata sign off).
-4. **Validate:** Run `python3 scripts/validate_copy.py <output-file> --public --register external` and check `pre-publish-checklist.md`.
+4. **Validate:** Run `python3 <MKT_ROOT>/scripts/validate_copy.py <output-file> --public --register external` and check `pre-publish-checklist.md`.
 
 ## Output
 

@@ -8,6 +8,7 @@
 //
 // Usage:
 //   node scripts/install-skills.mjs install [--agents claude,codex] [--dry-run]
+//   node scripts/install-skills.mjs install-agents [--dry-run]
 //   node scripts/install-skills.mjs uninstall [--dry-run]
 //   node scripts/install-skills.mjs check
 //   node scripts/install-skills.mjs list
@@ -22,6 +23,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
 const SKILLS_SRC = path.join(REPO_ROOT, "skills");
 const AGENTS_SRC = path.join(REPO_ROOT, "agents");
+const SCRIPTS_SRC = path.join(REPO_ROOT, "scripts");
+const TEMPLATES_SRC = path.join(REPO_ROOT, "templates");
+const CONTEXT_SRC = path.join(REPO_ROOT, "context");
+
+const SYNC_SCRIPTS = [
+  "validate_copy.py",
+  "analyze_page.py",
+  "competitor_scanner.py",
+  "social_calendar.py",
+  "generate_pdf_report.py",
+  "install-skills.mjs",
+];
 
 const HOME = os.homedir();
 const WIN = os.platform() === "win32";
@@ -51,6 +64,15 @@ function act(msg, fn) {
 }
 function lstatSafe(p) { try { return fs.lstatSync(p); } catch { return null; } }
 
+function isClaudeSubagentFile(filePath) {
+  try {
+    const head = fs.readFileSync(filePath, "utf8").slice(0, 600);
+    return head.startsWith("---\n") && /^name:\s+/m.test(head) && /^tools:\s+/m.test(head);
+  } catch {
+    return false;
+  }
+}
+
 function discoverSkills() {
   if (!fs.existsSync(SKILLS_SRC)) return [];
   return fs.readdirSync(SKILLS_SRC, { withFileTypes: true })
@@ -62,7 +84,7 @@ function discoverSkills() {
 function discoverAgents() {
   if (!fs.existsSync(AGENTS_SRC)) return [];
   return fs.readdirSync(AGENTS_SRC, { withFileTypes: true })
-    .filter((f) => f.isFile() && f.name.endsWith(".md"))
+    .filter((f) => f.isFile() && f.name.endsWith(".md") && isClaudeSubagentFile(path.join(AGENTS_SRC, f.name)))
     .map((f) => ({ name: f.name, file: path.join(AGENTS_SRC, f.name) }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
@@ -199,6 +221,15 @@ function cmdList() {
   for (const ag of discoverAgents()) log(`  - ${ag.name.replace(/\.md$/, "")}`);
 }
 
+function cmdInstallAgents() {
+  const agents = discoverAgents();
+  log(`JENGAI AI Marketing Team — linking ${agents.length} Claude subagents into ${CLAUDE_AGENTS_DIR}`);
+  for (const ag of agents) {
+    ensureFileLink(ag.file, path.join(CLAUDE_AGENTS_DIR, ag.name));
+  }
+  log("Done. Start a new Claude Code session to pick up updated subagents.");
+}
+
 function cmdSyncGtmBrain() {
   const targetBrain = positional[0];
   if (!targetBrain) {
@@ -213,23 +244,70 @@ function cmdSyncGtmBrain() {
   }
   const destSkills = path.join(mktRoot, "skills");
   const destAgents = path.join(mktRoot, "agents");
+  const destScripts = path.join(mktRoot, "scripts");
+  const destTemplates = path.join(mktRoot, "templates");
+  const destContext = path.join(mktRoot, "context");
+
   for (const sk of discoverSkills()) {
     const dest = path.join(destSkills, sk.name);
-    act(`copy skill ${sk.name} -> ${dest}`, () => fs.cpSync(sk.dir, dest, { recursive: true }));
+    act(`copy skill ${sk.name} -> ${dest}`, () => {
+      fs.mkdirSync(destSkills, { recursive: true });
+      fs.cpSync(sk.dir, dest, { recursive: true });
+    });
   }
   for (const ag of discoverAgents()) {
     const dest = path.join(destAgents, ag.name);
-    act(`copy agent ${ag.name} -> ${dest}`, () => fs.copyFileSync(ag.file, dest));
+    act(`copy agent ${ag.name} -> ${dest}`, () => {
+      fs.mkdirSync(destAgents, { recursive: true });
+      fs.copyFileSync(ag.file, dest);
+    });
   }
-  log("Synced into gtm-brain/marketing/. Run `node core-brain/scripts/brain-skills.mjs install` inside gtm-brain to activate for Renata and Berwyn.");
+  for (const scriptName of SYNC_SCRIPTS) {
+    const src = path.join(SCRIPTS_SRC, scriptName);
+    if (!fs.existsSync(src)) continue;
+    const dest = path.join(destScripts, scriptName);
+    act(`copy script ${scriptName} -> ${dest}`, () => {
+      fs.mkdirSync(destScripts, { recursive: true });
+      fs.copyFileSync(src, dest);
+    });
+  }
+  if (fs.existsSync(TEMPLATES_SRC)) {
+    for (const entry of fs.readdirSync(TEMPLATES_SRC, { withFileTypes: true })) {
+      if (!entry.isFile()) continue;
+      const src = path.join(TEMPLATES_SRC, entry.name);
+      const dest = path.join(destTemplates, entry.name);
+      act(`copy template ${entry.name} -> ${dest}`, () => {
+        fs.mkdirSync(destTemplates, { recursive: true });
+        fs.copyFileSync(src, dest);
+      });
+    }
+  }
+  if (fs.existsSync(CONTEXT_SRC)) {
+    for (const entry of fs.readdirSync(CONTEXT_SRC, { withFileTypes: true })) {
+      if (!entry.isFile()) continue;
+      const src = path.join(CONTEXT_SRC, entry.name);
+      const dest = path.join(destContext, entry.name);
+      act(`copy context ${entry.name} -> ${dest}`, () => {
+        fs.mkdirSync(destContext, { recursive: true });
+        fs.copyFileSync(src, dest);
+      });
+    }
+  }
+  log(
+    "Synced skills, agents, scripts, templates, and context into gtm-brain/marketing/.\n" +
+    "Next steps inside gtm-brain:\n" +
+    "  1. node core-brain/scripts/brain-skills.mjs install --from .\n" +
+    "  2. node marketing/scripts/install-skills.mjs install-agents"
+  );
 }
 
 switch (command) {
   case "install": cmdInstall(); break;
+  case "install-agents": cmdInstallAgents(); break;
   case "uninstall": cmdUninstall(); break;
   case "check": cmdCheck(); break;
   case "list": cmdList(); break;
   case "sync-gtm-brain": cmdSyncGtmBrain(); break;
   default:
-    log("Usage: node scripts/install-skills.mjs <install|uninstall|check|list|sync-gtm-brain> [--dry-run]");
+    log("Usage: node scripts/install-skills.mjs <install|install-agents|uninstall|check|list|sync-gtm-brain> [--dry-run]");
 }

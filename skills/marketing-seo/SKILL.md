@@ -9,7 +9,7 @@ Audits `jengai.com` (`jengai-com/public-website`) across on-page SEO, sitemap he
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `gtm-knowledge/messaging-and-value-proposition.md` and `marketing/outputs/messaging/approved-messaging.md`
 2. `gtm-knowledge/icp.md`
 3. `marketing/knowledge/website-tracking-and-embed-snippets.md`
@@ -28,7 +28,7 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 
 ### Step 1: Run Automated Multi-Page Crawl
 ```bash
-python3 scripts/analyze_page.py https://www.jengai.com --sitemap --max-pages 20
+python3 <MKT_ROOT>/scripts/analyze_page.py https://www.jengai.com --sitemap --max-pages 20
 ```
 If `PSI_API_KEY` is configured, append `--psi-key "$PSI_API_KEY"` for real LCP, INP, and CLS metrics.
 
@@ -43,6 +43,6 @@ If `PSI_API_KEY` is configured, append `--psi-key "$PSI_API_KEY"` for real LCP, 
 ### Step 3: Validate & Save
 Save to `SEO-AUDIT.md` (in Internal Reports register) and run:
 ```bash
-python3 scripts/validate_copy.py SEO-AUDIT.md --register internal
+python3 <MKT_ROOT>/scripts/validate_copy.py SEO-AUDIT.md --register internal
 ```
 Ensure zero positioning violations or unapproved stats appear in recommended meta descriptions or titles.

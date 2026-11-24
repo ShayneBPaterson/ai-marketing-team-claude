@@ -1,6 +1,6 @@
 # CLAUDE.md — JENGAI AI Marketing Team
 
-This repository holds the skills (`marketing-*`), subagents (`marketing-*`), templates, and utility scripts for JENGAI's AI marketing team. It operates directly against `jengai-corp/gtm-brain` as the single source of truth, and is structured to drop cleanly into `gtm-brain/marketing/skills/` and `gtm-brain/marketing/agents/` for cross-platform installation through `core-brain/scripts/brain-skills.mjs`.
+This repository holds the source skills (`marketing-*`), subagents (`marketing-*`), templates, and utility scripts for JENGAI's AI marketing team. It operates directly against `jengai-corp/gtm-brain` as the single source of truth and syncs cleanly into `gtm-brain/marketing/` (`skills/`, `agents/`, `scripts/`, `templates/`, and `context/`) as the canonical operating home for Marketing.
 
 ## Ownership and scope
 
@@ -22,10 +22,10 @@ Never invent company metrics, customer counts, pricing, proof points, or product
 
 ## Non-negotiable operating rules
 
-1. **Draft only, always.** No skill or agent may auto-publish, auto-send, or auto-post. Every customer-facing artifact is a draft awaiting explicit approval from Renata or Shayne.
+1. **Draft only, always.** No skill or agent may auto-publish, auto-send, or auto-post. Every customer-facing artifact is a draft awaiting explicit approval from **Renata** (CMO). **Shayne** sign-off is additionally required for Shayne founder-voice posts, Sales handoff collateral, and open compliance decisions (such as PlanHub citations).
 2. **Positioning lock.** JENGAI is a **pricing and operations platform for commercial specialty contractors**. JENGAI is **not** an estimating or takeoff tool.
 3. **Strict proof points.** Only cite the five approved customer proof points in `approved-messaging.md` (Bonitz, Pro-United Inc., Silver Slate Group, Transylvania Flooring Professionals, Axis Interior Systems) plus the standing \$15,000+ error-cost claim. Never freelance stats, flatten ranges, claim JENGAI "eliminates" errors, or hardcode customer counts or ARR without checking `core-brain/skills/salesforce-data/`.
-4. **Mandatory copy validation.** Run `python3 scripts/validate_copy.py <file>` (with `--public` for customer-facing content) and complete `pre-publish-checklist.md` before finishing any drafting task.
+4. **Mandatory copy validation.** Run `python3 <MKT_ROOT>/scripts/validate_copy.py <file>` (use `python` on Windows; add `--public` for customer-facing content) and complete `pre-publish-checklist.md` before finishing any drafting task.
 5. **No binaries in git and no external hosting.** Never write PDF, DOCX, XLSX, PPTX, or image deliverables into any git repository. Render binaries directly to SharePoint (`AI_Marketing_Outputs/...`) via `core-brain/scripts/sharepoint-path.mjs marketing` or `sharepoint_path.py` and leave a tracked markdown source or `<basename>.sharepoint.md` pointer in the repo. Never publish work products to `claude.ai` or external hosts.
-6. **Cross-platform and machine-agnostic.** Keep all paths relative to the repo root or resolved via `JENGAI_GTM_BRAIN`. Never hardcode user home directories or OS-specific absolute paths in skills or scripts.
+6. **Cross-platform and machine-agnostic.** Keep all paths relative to `<GTM_BRAIN>` or `<MKT_ROOT>` (resolved via `context/gtm-brain-map.md` or `JENGAI_GTM_BRAIN`). Never hardcode user home directories, `/tmp/`, or OS-specific absolute paths in skills or scripts.
 7. **JENGAI is always full caps.** Never write `Jengai` or `jengai` in copy, headlines, or reports.

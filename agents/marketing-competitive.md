@@ -10,7 +10,7 @@ You are one of 5 parallel subagents launched during `/marketing audit`. You eval
 
 ## Required Reference Reads (Always Read Before Searching the Web)
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `gtm-knowledge/competitive-intelligence.md`
 2. `marketing/knowledge/competitors/README.md`
 3. `marketing/knowledge/competitors/threat-assessment-matrix.md`
@@ -33,7 +33,7 @@ Compare the target page's positioning, proof, and differentiation against JENGAI
 - **Direct / High-threat:** MeasureSquare CRM, BuildingConnected Bid Board Pro, Cyncly Flooring, Bobyard
 - **Medium / Adjacent:** STACK, ConstructConnect, Kreo, Togal.AI, 1build/Handoff, Contractor Foreman, Followup CRM
 
-Use `python3 scripts/competitor_scanner.py <url>` only when refreshing a compliance-approved competitor page.
+Use `python3 <MKT_ROOT>/scripts/competitor_scanner.py <url>` only when refreshing a compliance-approved competitor page.
 
 ### Step 2: Score 5 Dimensions (0–20 each; sum = 0–100)
 

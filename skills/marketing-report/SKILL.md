@@ -9,7 +9,7 @@ Compiles available JENGAI audit artifacts into a single executive Markdown repor
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `core-brain/how-we-work/ai-conventions/jengai-voice-and-communication-rules.md`
 2. `gtm-knowledge/gtm-specific-voice.md` (Internal reports & audits section)
 3. `marketing/status.md`
@@ -51,4 +51,4 @@ If no prior audit exists, recommend running `/marketing audit https://www.jengai
 
 Include: Executive summary, Unified 6-category scorecard, Top 3 priority actions, Category deep-dives, Competitive snapshot (internal only), SEO & tracking snapshot, Prioritized action plan (This week / This month / This quarter), and Live data gaps to close.
 
-Run `python3 scripts/validate_copy.py MARKETING-REPORT.md --register internal`. Offer `/marketing report-pdf` (writing directly to SharePoint) if a formatted PDF is needed.
+Run `python3 <MKT_ROOT>/scripts/validate_copy.py MARKETING-REPORT.md --register internal`. Offer `/marketing report-pdf` (writing directly to SharePoint) if a formatted PDF is needed.

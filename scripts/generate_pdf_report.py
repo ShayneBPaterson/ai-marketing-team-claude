@@ -19,6 +19,7 @@ import argparse
 import json
 import os
 import sys
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
@@ -282,9 +283,27 @@ def generate_report(data: dict, output_path: str | Path) -> Path:
 def main():
     parser = argparse.ArgumentParser(description="Generate a JENGAI-branded marketing PDF report.")
     parser.add_argument("input_json", help="Path to structured audit JSON input.")
-    parser.add_argument("output_pdf", nargs="?", default=None, help="Output PDF path (use /tmp or SharePoint; never inside a git repo).")
-    parser.add_argument("--sharepoint-rel", default=None, help="Relative path inside AI_Marketing_Outputs (writes directly to SharePoint).")
-    parser.add_argument("--stub-path", default=None, help="Optional repo path to write a <basename>.sharepoint.md breadcrumb stub.")
+    parser.add_argument(
+        "output_pdf",
+        nargs="?",
+        default=None,
+        help="Output PDF path (use OS temp directory or SharePoint; never inside a git repo).",
+    )
+    parser.add_argument(
+        "--sharepoint-rel",
+        default=None,
+        help="Relative path inside AI_Marketing_Outputs (writes directly to SharePoint).",
+    )
+    parser.add_argument(
+        "--stub-path",
+        default=None,
+        help="Optional repo path to write a <basename>.sharepoint.md breadcrumb stub.",
+    )
+    parser.add_argument(
+        "--temp-fallback",
+        action="store_true",
+        help="If SharePoint cannot be resolved, write to the OS temp directory instead of exiting with an error.",
+    )
     args = parser.parse_args()
 
     data = json.loads(Path(args.input_json).read_text(encoding="utf-8"))
@@ -292,7 +311,19 @@ def main():
     if args.sharepoint_rel:
         sp_root = resolve_sharepoint_marketing_dir()
         if not sp_root:
-            print("Error: Could not resolve SharePoint AI_Marketing_Outputs folder. Ensure gtm-brain/core-brain is present and SharePoint is synced.", file=sys.stderr)
+            if args.temp_fallback:
+                fallback = Path(tempfile.gettempdir()) / Path(args.sharepoint_rel).name
+                generate_report(data, fallback)
+                print(
+                    f"SharePoint not resolved locally; report written to temp folder: {fallback}\n"
+                    f"Upload manually to AI_Marketing_Outputs/{args.sharepoint_rel}."
+                )
+                return
+            print(
+                "Error: Could not resolve SharePoint AI_Marketing_Outputs folder. "
+                "Ensure gtm-brain/core-brain is present and SharePoint is synced (or pass --temp-fallback).",
+                file=sys.stderr,
+            )
             sys.exit(2)
         target = sp_root / args.sharepoint_rel
         generate_report(data, target)

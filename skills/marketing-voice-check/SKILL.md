@@ -1,6 +1,6 @@
 ---
 name: marketing-voice-check
-description: Run JENGAI's mandatory pre-publish voice, positioning, proof-point, and compliance gate on any draft file or pasted copy using scripts/validate_copy.py and pre-publish-checklist.md.
+description: Run JENGAI's mandatory pre-publish voice, positioning, proof-point, and compliance gate on any draft file or pasted copy using <MKT_ROOT>/scripts/validate_copy.py and pre-publish-checklist.md.
 ---
 
 # JENGAI Pre-Publish Voice & Claim Gate (`/marketing voice-check`)
@@ -9,7 +9,7 @@ Turns JENGAI's voice rules, pre-publish checklist, positioning lock, and proof-p
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `core-brain/how-we-work/ai-conventions/jengai-voice-and-communication-rules.md`
 2. `core-brain/how-we-work/ai-conventions/pre-publish-checklist.md`
 3. `gtm-knowledge/gtm-specific-voice.md`
@@ -22,7 +22,7 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 Determine the register (`external`, `founder`, `internal`, or `outreach`) and whether the draft is customer-facing (`--public`), then run:
 
 ```bash
-python3 scripts/validate_copy.py <path-to-file> --public --register <register>
+python3 <MKT_ROOT>/scripts/validate_copy.py <path-to-file> --public --register <register>
 ```
 
 (Omit `--public` only for internal leadership reports or internal competitive analyses.)
@@ -62,5 +62,5 @@ Inspect the draft manually against every remaining rule in `pre-publish-checklis
 | --- | --- | --- | --- |
 
 ## Sign-Off
-- Ready for Renata / Shayne approval: YES / NO (list blocking fixes)
+- Ready for Renata (CMO) approval (+ Shayne sign-off if Shayne founder voice / Sales handoff): YES / NO (list blocking fixes)
 ```

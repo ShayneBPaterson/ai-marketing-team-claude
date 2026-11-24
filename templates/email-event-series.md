@@ -1,10 +1,10 @@
 # JENGAI Trade Show & Association Event Kit — [Event Name]
 
-- **Status:** DRAFT — awaiting Renata or Shayne approval
+- **Status:** DRAFT — awaiting Renata (CMO) approval (+ Sales routing confirmation with Shayne)
 - **Event dates:** [MM/DD/YYYY – MM/DD/YYYY] *(verified against `marketing/events/2026/`)*
 - **Location & booth:** [City, State] · [Booth # if applicable]
 - **Association / audience:** [Starnet Worldwide / FUSE Alliance / AHSG Commercial USA / General commercial specialty contractors]
-- **On-site meeting owner:** [Confirm routing — e.g., Renata Doralieva-Paterson]
+- **On-site meeting & Calendly owner:** [CONFIRM BEFORE SEND — `website-tracking-and-embed-snippets.md` currently uses `https://calendly.com/renata-jengai/jengai-discovery-call`; verify with Renata and Shayne whether post-2026-11-09 event bookings stay on Renata's link or route to Sales]
 
 ---
 
@@ -20,7 +20,7 @@
 
 - **Subject:** [Conference name] — meet JENGAI in [City]
 - **Preview text:** [Booth number or meeting invite]
-- **CTA:** Schedule a 30-minute discovery call (`https://calendly.com/renata-jengai/jengai-discovery-call`)
+- **CTA:** Schedule a 30-minute discovery call (`[Confirmed Calendly URL — verify current Sales/Marketing link in website-tracking-and-embed-snippets.md]`)
 
 ```text
 [Short, plain invite focused on conference travel — say "traveling to [City] for [Conference]", never "road trip". Skip the full company description if sending exclusively to Starnet, FUSE, or Commercial USA members.]
@@ -30,7 +30,7 @@
 
 ## 3. Onsite Welcome Email (Day 1 — Branded MJML)
 
-- Build from `templates/email-constant-contact.mjml`.
+- Build from `<MKT_ROOT>/templates/email-constant-contact.mjml`.
 - Include booth location, live walkthrough hours, and pre-filled Calendly booking link.
 
 ---
@@ -39,7 +39,7 @@
 
 - **Tracking:** GA4 (`G-EJJJHWZFQQ`) and HubSpot tracking (`51915935`) in `<head>`.
 - **Form:** Custom-styled form posting to HubSpot Forms API (`https://api.hsforms.com/submissions/v3/integration/submit/51915935/<form ID>`) with `hubspotutk` cookie, contact fields (`firstname`, `lastname`, `email`), company fields (bids/month, pricing/ERP/takeoff software), and consent checkboxes.
-- **Post-submit:** Inline pre-filled Calendly iframe (`renata-jengai/jengai-discovery-call`) plus GA4 `calendly_booking` message listener.
+- **Post-submit:** Inline pre-filled Calendly iframe (confirm current Sales/Marketing booking link in `website-tracking-and-embed-snippets.md`) plus GA4 `calendly_booking` message listener.
 
 ---
 

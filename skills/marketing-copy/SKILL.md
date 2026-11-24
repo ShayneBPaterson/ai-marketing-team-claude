@@ -5,11 +5,11 @@ description: Write or rewrite JENGAI website, landing page, or collateral copy g
 
 # JENGAI Copywriting & Messaging Engine (`/marketing copy`)
 
-Analyzes existing JENGAI copy or drafts new website/landing/collateral copy strictly grounded in `gtm-brain`. Every line complies with Renata's 2026-08-31 positioning lock and passes `scripts/validate_copy.py`.
+Analyzes existing JENGAI copy or drafts new website/landing/collateral copy strictly grounded in `gtm-brain`. Every line complies with Renata's 2026-08-31 positioning lock and passes `<MKT_ROOT>/scripts/validate_copy.py`.
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `gtm-knowledge/messaging-and-value-proposition.md`
 2. `marketing/outputs/messaging/approved-messaging.md`
 3. `marketing/outputs/messaging/headline-bank.md`
@@ -35,6 +35,6 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
    - Provide a **curated headline swipe set** pulled from or aligned with `headline-bank.md` (sentence case per `visual-brand-guide.md`, JENGAI in full caps).
 4. **Mandatory Validation:** Save to `COPY-SUGGESTIONS.md` and run:
    ```bash
-   python3 scripts/validate_copy.py COPY-SUGGESTIONS.md --public --register external
+   python3 <MKT_ROOT>/scripts/validate_copy.py COPY-SUGGESTIONS.md --public --register external
    ```
    Complete `pre-publish-checklist.md` (including cutting ~20% bloat while keeping complete sentences and 1- or 3-item lists).

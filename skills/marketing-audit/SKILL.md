@@ -9,10 +9,10 @@ Launches JENGAI's 5 parallel audit subagents (`marketing-content`, `marketing-co
 
 ## Mandatory Pre-Flight
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md`. Confirm the target URL (default: `https://www.jengai.com`, or specific pages like `/starnet`, `/demo`). Do not run generic e-commerce/creator business-type detection — JENGAI is a B2B vertical SaaS pricing and operations platform for commercial finish-trade subcontractors.
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md`. Confirm the target URL (default: `https://www.jengai.com`, or specific pages like `/starnet`, `/demo`). Do not run generic e-commerce/creator business-type detection — JENGAI is a B2B vertical SaaS pricing and operations platform for commercial finish-trade subcontractors.
 
 ## Phase 1: Discovery
-1. Run `python3 scripts/analyze_page.py <url> --sitemap --max-pages 15` to collect technical, heading, schema, CTA, and JENGAI tracking stack data.
+1. Run `python3 <MKT_ROOT>/scripts/analyze_page.py <url> --sitemap --max-pages 15` to collect technical, heading, schema, CTA, and JENGAI tracking stack data.
 2. Fetch key pages (homepage, `/starnet`, `/demo`, success stories, product pages) so all 5 subagents analyze live copy.
 3. Check if existing reports exist in the working directory (`COMPETITOR-REPORT.md`, `SEO-AUDIT.md`, `LANDING-CRO.md`, `BRAND-VOICE-AUDIT.md`) to cross-reference.
 
@@ -56,4 +56,4 @@ Write in `gtm-specific-voice.md`'s **Internal reports & audits** register (compl
 4. Detailed findings from all 5 subagents
 5. Open data requests (GA4, HubSpot, Salesforce, PageSpeed Insights)
 
-Run `python3 scripts/validate_copy.py MARKETING-AUDIT.md --register internal` before finishing. Suggest `/marketing report-pdf` (rendered to SharePoint) if Renata or Shayne want a formatted PDF copy.
+Run `python3 <MKT_ROOT>/scripts/validate_copy.py MARKETING-AUDIT.md --register internal` before finishing. Suggest `/marketing report-pdf` (rendered to SharePoint) if Renata or Shayne want a formatted PDF copy.

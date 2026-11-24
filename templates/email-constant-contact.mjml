@@ -51,13 +51,13 @@
       </mj-column>
     </mj-section>
 
-    <!-- Muted footer -->
+    <!-- Muted footer (Constant Contact automatically appends the configured JENGAI physical mailing address and CAN-SPAM unsubscribe block on send) -->
     <mj-section background-color="#f8f8f9" padding="20px 28px">
       <mj-column>
         <mj-divider border-color="#edeef1" border-width="1px" padding-bottom="16px" />
         <mj-text font-size="12px" color="#67697f" line-height="1.5">
           JENGAI — Pricing and operations platform for commercial specialty contractors.<br />
-          [Company physical mailing address] · <a href="{{unsubscribe_url}}" style="color:#2563eb;">Unsubscribe</a>
+          [[COMPANY_ADDRESS]] · <a href="[[UNSUBSCRIBE_LINK]]" style="color:#2563eb;">Unsubscribe</a>
         </mj-text>
       </mj-column>
     </mj-section>

@@ -9,7 +9,7 @@ Instead of trying to guess an unknown brand's personality, this skill audits any
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `core-brain/how-we-work/ai-conventions/jengai-voice-and-communication-rules.md`
 2. `core-brain/how-we-work/ai-conventions/pre-publish-checklist.md`
 3. `gtm-knowledge/gtm-specific-voice.md`
@@ -19,7 +19,7 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 ## Audit Dimensions (Scored 0–100)
 
 1. **Positioning & Claim Integrity (30 pts):** Pricing and operations platform (never estimating/takeoff tool); only 5 approved customers + \$15,000+ claim; zero on-hold or banned claims; JENGAI always full caps.
-2. **Voice & Register Alignment (30 pts):** Runs `python3 scripts/validate_copy.py <target> --public` + checks complete sentences, explicit connections, 1- or 3-item lists, zero AI/corporate words, identity marketing ("buy this" → "be this"), and correct register (External vs. Founder vs. Internal vs. Outreach).
+2. **Voice & Register Alignment (30 pts):** Runs `python3 <MKT_ROOT>/scripts/validate_copy.py <target> --public` + checks complete sentences, explicit connections, 1- or 3-item lists, zero AI/corporate words, identity marketing ("buy this" → "be this"), and correct register (External vs. Founder vs. Internal vs. Outreach).
 3. **Visual Design System v2 Compliance (25 pts):**
    - Core palette: `#020133` deep header, `#000180` primary action, `#d0ffa3` lime as spark/accent **only** (never full background), `#18181f` ink, `#67697f` muted text, `#edeef1` borders.
    - Typography: **Inter**, **sentence case everywhere** (no Title Case in headings or table columns), proper hierarchy.
@@ -36,4 +36,4 @@ Produce a clear internal compliance report with:
 - Line-by-line Before/After fixes
 - Sign-off checklist for Renata / Berwyn
 
-Run `python3 scripts/validate_copy.py BRAND-AUDIT.md --register internal`.
+Run `python3 <MKT_ROOT>/scripts/validate_copy.py BRAND-AUDIT.md --register internal`.

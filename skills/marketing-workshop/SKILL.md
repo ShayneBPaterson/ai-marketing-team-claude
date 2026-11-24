@@ -9,7 +9,7 @@ Supports JENGAI's active owner-focused education campaigns (`marketing/campaigns
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `marketing/campaigns/2026-08-owner-ai-workshops/readme.md` and current workshop plan files
 2. `marketing/outputs/messaging/approved-messaging.md` and `gtm-knowledge/icp.md`
 3. `core-brain/how-we-work/ai-conventions/jengai-voice-and-communication-rules.md` and `gtm-knowledge/gtm-specific-voice.md`
@@ -37,4 +37,4 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 
 ## Validation
 
-Run `python3 scripts/validate_copy.py <output-file> --public --register external` and verify against `pre-publish-checklist.md`. Save as `WORKSHOP-CAMPAIGN-<slug>-YYYY-MM-DD.md` (draft only).
+Run `python3 <MKT_ROOT>/scripts/validate_copy.py <output-file> --public --register external` and verify against `pre-publish-checklist.md`. Save as `WORKSHOP-CAMPAIGN-<slug>-YYYY-MM-DD.md` (draft only).

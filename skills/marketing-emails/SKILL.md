@@ -9,7 +9,7 @@ Drafts JENGAI marketing emails built for **Constant Contact** (company standard)
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `marketing/outputs/messaging/approved-messaging.md` and `gtm-knowledge/messaging-and-value-proposition.md`
 2. `marketing/knowledge/channels-and-cadence.md`
 3. `core-brain/how-we-work/ai-conventions/jengai-voice-and-communication-rules.md` and `gtm-knowledge/gtm-specific-voice.md`
@@ -19,7 +19,7 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 
 | Sequence Type | Platform & Register | Use Case |
 |---|---|---|
-| **Weekly Nurture** | Constant Contact · External copy or Shayne founder voice | 1 email/week paired to the quarterly content calendar (finish-trade inbox is saturated — lead with numbers/stories hitting Find work, Win more work, or Make more money) |
+| **Weekly Nurture** | Constant Contact · External copy, Renata CMO/Founder voice, or Shayne founder voice | 1 email/week paired to the quarterly content calendar (finish-trade inbox is saturated — lead with numbers/stories hitting Find work, Win more work, or Make more money) |
 | **Product Release** | Constant Contact · External copy | 2-email pair modeled on `2026-09-24-data-privatization-release-email` (Email 1: Coming soon; Email 2: Now live + walkthrough) |
 | **Case Study Series** | Constant Contact · External copy | Multi-touch proof series modeled on `2026-09-28-case-study-email-series` featuring Bonitz, Pro-United, Silver Slate, Transylvania, or Axis |
 | **Event Broadcast** | Constant Contact · External copy | Pre-show invite, onsite welcome, and post-show follow-up for Starnet, FUSE, and Commercial USA |
@@ -29,7 +29,7 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 
 ## JENGAI Visual Email Standard (MJML)
 
-When HTML/MJML is requested, use `templates/email-constant-contact.mjml`:
+When HTML/MJML is requested, use `<MKT_ROOT>/templates/email-constant-contact.mjml`:
 - **Header:** Solid `#020133` band, left-aligned inverse `JENGAI` wordmark.
 - **Primary CTA:** Single `#000180` pill button (`border-radius: 48px`), white label, default `"Book a demo"`.
 - **Accent:** Lime `#d0ffa3` only as a small spark (dot or thin divider) — **never a background**.
@@ -42,6 +42,6 @@ When HTML/MJML is requested, use `templates/email-constant-contact.mjml`:
 2. Save to `EMAIL-SEQUENCES.md` (and `.mjml` when requested).
 3. Run:
    ```bash
-   python3 scripts/validate_copy.py EMAIL-SEQUENCES.md --public --register external
+   python3 <MKT_ROOT>/scripts/validate_copy.py EMAIL-SEQUENCES.md --public --register external
    ```
    Mark clearly as `DRAFT — AWAITING RENATA/SHAYNE APPROVAL`.

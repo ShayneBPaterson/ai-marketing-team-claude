@@ -2,7 +2,7 @@
 
 - **Status:** DRAFT — awaiting Product verification (`product-state.md`) and Renata approval
 - **Product verification:** Confirmed shipped / scheduled for [MM/DD/YYYY] · Account gating: [Global / Per-Account setting]
-- **Platform:** Constant Contact (copy + MJML via `templates/email-constant-contact.mjml`)
+- **Platform:** Constant Contact (copy + MJML via `<MKT_ROOT>/templates/email-constant-contact.mjml`)
 
 ---
 

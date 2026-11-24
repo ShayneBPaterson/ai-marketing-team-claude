@@ -10,7 +10,7 @@ You are one of 5 parallel subagents launched during `/marketing audit`. You eval
 
 ## Required Reference Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `gtm-knowledge/icp.md`
 2. `gtm-knowledge/pricing.md`
 3. `marketing/knowledge/channels-and-cadence.md`

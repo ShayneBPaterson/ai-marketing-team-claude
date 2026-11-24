@@ -10,7 +10,7 @@ You are one of 5 parallel subagents launched during `/marketing audit`. You eval
 
 ## Required Reference Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `marketing/knowledge/website-tracking-and-embed-snippets.md`
 2. `gtm-knowledge/icp.md`
 3. `gtm-knowledge/messaging-and-value-proposition.md`
@@ -29,7 +29,7 @@ Trace JENGAI's live conversion flow:
 1. Entry page (`jengai.com`, `/starnet`, `/demo`, case study, or workshop page)
 2. Primary CTA ("Book a demo" / "Schedule a discovery call")
 3. Form capture (HubSpot Forms API portal `51915935`: `/starnet` form `212159f0-b164-41e1-902a-a75533574d67`, `/demo` form `a2982abc-3116-4f3c-b379-34976645030b`; verify `hubspotutk` cookie forwarding and consent checkboxes)
-4. Scheduling handoff (Calendly `renata-jengai/jengai-discovery-call` 30 min or `renata-jengai/1hour` 45 min, pre-filled iframe parameters)
+4. Scheduling handoff (Calendly pre-filled iframe parameters — confirm current Sales/Marketing routing; `website-tracking-and-embed-snippets.md` lists `renata-jengai/jengai-discovery-call` 30 min and `renata-jengai/1hour` 45 min)
 5. Event measurement (check whether GA4 form-submit and `calendly_booking` events are firing — currently known gaps in `website-tracking-and-embed-snippets.md`)
 
 ### Step 2: Score 5 Dimensions (0–20 each; sum = 0–100)

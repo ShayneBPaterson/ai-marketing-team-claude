@@ -7,7 +7,7 @@ JENGAI's internal AI marketing suite for Claude Code and Codex, built for **Rena
 - **Positioning lock (2026-08-31):** JENGAI is a **pricing and operations platform for commercial specialty contractors**. JENGAI is **not** an estimating or takeoff tool.
 - **ICP lock:** Owners and Presidents (influenced by Heads of Estimation and Sales) at US and Canada commercial finish-trade subcontractors (stone, tile, flooring) with **\$4M+ annual revenue** who self-perform takeoffs, concentrated in **FUSE Alliance, Starnet Worldwide, and Commercial USA**.
 - **Strict proof-point governance:** Only the five approved customer stories in `approved-messaging.md` (Bonitz, Pro-United Inc., Silver Slate Group, Transylvania Flooring Professionals, Axis Interior Systems) plus the standing \$15,000+ error-cost claim. Every customer-facing draft passes `scripts/validate_copy.py`.
-- **Draft-only approval gate:** Nothing posts, sends, or publishes automatically. All outbound drafts await explicit Renata or Shayne approval (notified via Microsoft Teams).
+- **Draft-only approval gate:** Nothing posts, sends, or publishes automatically. All outbound marketing drafts await explicit **Renata (CMO)** approval (notified via Microsoft Teams); **Shayne** additionally signs off on Shayne founder-voice posts, Sales handoff collateral, and open compliance decisions.
 - **No binaries in git and no external hosting:** PDFs and visual deliverables write directly to SharePoint (`AI_Marketing_Outputs/...`) via `core-brain/scripts/sharepoint_path.py` with a `.sharepoint.md` breadcrumb in the repo. Never publish to `claude.ai`.
 - **Sales boundary:** Subscription proposals (`sales/skills/sales-proposal/`), live sales call scripts, and deal-closing outreach stay with Sales (Shayne, Zhai, Aica).
 
@@ -80,24 +80,35 @@ ai-marketing-team-claude/
 
 ## Installation (macOS, Linux & Windows)
 
-### Option 1 (Recommended): Sync into `gtm-brain`
-Drop the skills and subagents directly into `gtm-brain/marketing/` so Renata and Berwyn receive updates automatically through `core-brain/scripts/brain-skills.mjs`:
+### Option 1 (Recommended): Run from `jengai-corp/gtm-brain` (Canonical Home)
+Sync skills, subagents, scripts, templates, and the `gtm-brain` map into `gtm-brain/marketing/` so Renata and Berwyn operate from a single repository:
 
 ```bash
 node scripts/install-skills.mjs sync-gtm-brain ../jengai-corp/gtm-brain --dry-run
 node scripts/install-skills.mjs sync-gtm-brain ../jengai-corp/gtm-brain
-cd ../jengai-corp/gtm-brain && node core-brain/scripts/brain-skills.mjs install
 ```
+
+Then on Renata's or Berwyn's machine (macOS or Windows, inside their `gtm-brain` clone):
+
+```bash
+# 1. Link all gtm-brain + core-brain skills into Claude Code and Codex
+node core-brain/scripts/brain-skills.mjs install --from .
+
+# 2. Link the 10 marketing-* Claude subagents into ~/.claude/agents/
+node marketing/scripts/install-skills.mjs install-agents
+```
+
+*(Use `--from .` because `brain-skills.mjs` defaults to cloning from `JENGAI-Brain`, whereas `gtm-brain` is hosted under `jengai-corp/gtm-brain`.)*
 
 ### Option 2: Install Directly From This Repo
 Links skills into `~/.agents/skills/` → `~/.claude/skills/` and `~/.codex/skills/`, plus subagents into `~/.claude/agents/`:
 
 ```bash
-export JENGAI_GTM_BRAIN=/path/to/gtm-brain
+export JENGAI_GTM_BRAIN=/path/to/gtm-brain   # PowerShell: $env:JENGAI_GTM_BRAIN="C:\path\to\gtm-brain"
 node scripts/install-skills.mjs install
 ```
 
-Optional dependency for PDF generation:
+Optional dependency for PDF generation (use `python` or `py -3` on Windows if `python3` is not on `PATH`):
 
 ```bash
 pip install -r requirements.txt

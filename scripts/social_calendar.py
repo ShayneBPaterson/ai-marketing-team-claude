@@ -44,6 +44,7 @@ PILLARS = [
 
 EMOTIONAL_BUTTONS = ["Find work", "Win more work", "Make more money"]
 FRAMEWORKS = ["Problem -> Solution -> Proof", "Before / After", "Named Growth Story -> JENGAI Bridge"]
+VOICES = ["JENGAI company voice", "Renata CMO/Founder voice", "Shayne founder voice"]
 
 
 def next_monday(start: date) -> date:
@@ -66,6 +67,12 @@ def generate_weekly_calendar(
         pillar = PILLARS[(idx // 4) % len(PILLARS)]
         button = EMOTIONAL_BUTTONS[idx % len(EMOTIONAL_BUTTONS)]
         framework = FRAMEWORKS[idx % len(FRAMEWORKS)]
+        voice = VOICES[idx % len(VOICES)]
+        approval = (
+            "DRAFT — awaiting Renata approval (+ Shayne sign-off for Shayne founder voice)"
+            if voice == "Shayne founder voice"
+            else "DRAFT — awaiting Renata approval"
+        )
 
         rows.append({
             "week": idx + 1,
@@ -76,12 +83,12 @@ def generate_weekly_calendar(
             "pillar_name": pillar["name"],
             "emotional_button": button,
             "framework": framework,
-            "voice": "Shayne founder voice" if idx % 2 == 0 else "JENGAI company voice",
+            "voice": voice,
             "approved_proof_anchor": pillar["default_proof"],
             "default_cta": "Book a demo (soften for cold LinkedIn)",
             "event_anchor": event_map.get(idx + 1),
             "source_provenance": "[Fill: internal-pattern-only OR public-citation with verified URL — never name direct competitors]",
-            "approval_status": "DRAFT — awaiting Renata/Shayne approval",
+            "approval_status": approval,
         })
 
     return {

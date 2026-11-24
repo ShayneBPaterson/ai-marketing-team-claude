@@ -10,7 +10,7 @@ You are one of 5 parallel subagents launched during `/marketing audit`. You eval
 
 ## Required Reference Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `marketing/knowledge/website-tracking-and-embed-snippets.md`
 2. `gtm-knowledge/messaging-and-value-proposition.md` (to ensure title/H1/meta recommendations never violate positioning lock)
 3. `marketing/knowledge/visual-brand-guide.md`
@@ -20,7 +20,7 @@ Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
 ### Step 1: Run Automated Technical Scan
 Run:
 ```bash
-python3 scripts/analyze_page.py <url> --sitemap --max-pages 15
+python3 <MKT_ROOT>/scripts/analyze_page.py <url> --sitemap --max-pages 15
 ```
 If a PageSpeed Insights key is available in the environment (`PSI_API_KEY`), pass `--psi-key "$PSI_API_KEY"` to capture real **LCP, INP, and CLS** (never benchmark deprecated FID).
 

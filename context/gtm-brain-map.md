@@ -2,7 +2,7 @@
 
 All `marketing-*` skills, subagents, and scripts treat `jengai-corp/gtm-brain` (and its `core-brain` submodule) as the single source of truth. Do not duplicate volatile company facts, customer counts, pricing, or competitor profiles into this repository.
 
-## Locating `gtm-brain` (machine-agnostic)
+## Locating `gtm-brain` and Marketing Tools (machine-agnostic)
 
 Resolve `<GTM_BRAIN>` in this order on macOS, Linux, and Windows:
 
@@ -10,6 +10,12 @@ Resolve `<GTM_BRAIN>` in this order on macOS, Linux, and Windows:
 2. **Environment variable:** If `JENGAI_GTM_BRAIN` is set and points to a valid clone, use `$JENGAI_GTM_BRAIN`.
 3. **Sibling checkout:** Check `../jengai-corp/gtm-brain` and `../gtm-brain` relative to this repository root.
 4. **Unavailable:** If `<GTM_BRAIN>` cannot be reached on the current machine, stop before writing customer-facing claims and tell the operator to set `JENGAI_GTM_BRAIN` or clone `gtm-brain` with `--recurse-submodules`.
+
+Resolve `<MKT_ROOT>` (where `scripts/`, `templates/`, and `context/gtm-brain-map.md` live):
+
+1. **Inside `gtm-brain` (recommended canonical home):** `<GTM_BRAIN>/marketing` (so scripts are `<GTM_BRAIN>/marketing/scripts/*.py`, templates are `<GTM_BRAIN>/marketing/templates/*`, and this map is `<GTM_BRAIN>/marketing/context/gtm-brain-map.md`).
+2. **Standalone `ai-marketing-team-claude` checkout:** the repository root containing `scripts/validate_copy.py` and `templates/`.
+3. **Cross-platform runtime rules:** Use `python3` on macOS/Linux and `python` (or `py -3`) on Windows. Write temporary scratch files to the OS temp directory (`/tmp` on macOS/Linux, `%TEMP%` on Windows) — never inside a git repository.
 
 ## Authoritative File Index
 
@@ -64,3 +70,5 @@ When a marketing task requires live data or system access, invoke these canonica
 - **MeasureSquare wording (`marketing/status.md` 2026-11-03):** MeasureSquare takeoff (MS8) is a partner tool JENGAI works with; only MeasureSquare CRM competes (and fits multi-location contractors poorly).
 - **PlanHub citations (`findings-2026-08-01-growth-story-sourcing.md`):** Flag any public citation of PlanHub case studies for Renata/Shayne review until resolved.
 - **Unconfirmed customer count (`headline-bank.md`):** Do not publish "60+" or stale "37 customers" without verifying live via `salesforce-data`.
+- **Calendly discovery-call routing (post-2026-11-09 Sales split):** `website-tracking-and-embed-snippets.md` (updated 2026-10-30) still points `/starnet` and `/demo` embeds at `https://calendly.com/renata-jengai/jengai-discovery-call` and `renata-jengai/1hour`. Because Sales moved to Shayne on 2026-11-09, confirm with Renata and Shayne before launching new event/landing pages whether bookings should stay on Renata's link or route to Sales.
+- **`jengai.com/success-stories` 404 alert (2026-11-21 site audit):** `/success-stories` (plus `/pricing` and `/about`) returned HTTP 404 in the 2026-11-21 website audit. Verify `/success-stories` is live before linking it in any LinkedIn post or Constant Contact email; until restored, route CTAs to `https://www.jengai.com/demo` or a verified live customer story URL.

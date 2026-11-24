@@ -10,7 +10,7 @@ description: DORMANT / TEST-ONLY skill (paid ads are currently parked per channe
 
 ## Mandatory Pre-Flight Reads
 
-Resolve `<GTM_BRAIN>` via `context/gtm-brain-map.md` and read:
+Resolve `<GTM_BRAIN>` and `<MKT_ROOT>` (`<GTM_BRAIN>/marketing` inside `gtm-brain`, else repo root) via `<MKT_ROOT>/context/gtm-brain-map.md` and read:
 1. `marketing/knowledge/channels-and-cadence.md`
 2. `gtm-knowledge/icp.md` and `gtm-knowledge/pricing.md`
 3. `marketing/outputs/messaging/approved-messaging.md` and `marketing/outputs/messaging/headline-bank.md`
@@ -41,5 +41,5 @@ Before any test launches, confirm on the destination landing page:
 
 Save to `AD-CAMPAIGNS.md` clearly stamped `STATUS: TEST PROPOSAL — PARKED CHANNEL, REQUIRES RENATA APPROVAL + GA4 CONVERSION TRACKING PREREQUISITE`. Do not fabricate ROAS or CPA projections without historical JENGAI ad data. Run:
 ```bash
-python3 scripts/validate_copy.py AD-CAMPAIGNS.md --public --register external
+python3 <MKT_ROOT>/scripts/validate_copy.py AD-CAMPAIGNS.md --public --register external
 ```

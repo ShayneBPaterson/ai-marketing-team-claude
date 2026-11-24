@@ -13,17 +13,17 @@
 - [ ] Confirm positioning lock (pricing and operations platform, never estimating or takeoff tool)
 - [ ] Select approved proof points from `marketing/outputs/messaging/approved-messaging.md`
 - [ ] Draft landing page updates or dedicated page brief for `jengai-com/public-website`
-- [ ] Draft Constant Contact emails (copy + branded MJML via `templates/email-constant-contact.mjml`)
-- [ ] Draft weekly LinkedIn announcement post (Shayne founder voice or JENGAI company voice)
+- [ ] Draft Constant Contact emails (copy + branded MJML via `<MKT_ROOT>/templates/email-constant-contact.mjml`)
+- [ ] Draft weekly LinkedIn announcement post (JENGAI company voice, Renata CMO/Founder voice, or Shayne founder voice)
 
 ## T-1 Week: QA, Tracking & Sales Enablement
 
-- [ ] Run `python3 scripts/validate_copy.py <drafts> --public --register external` (0 errors)
+- [ ] Run `python3 <MKT_ROOT>/scripts/validate_copy.py <drafts> --public --register external` (or `python` on Windows; 0 errors)
 - [ ] Complete `core-brain/how-we-work/ai-conventions/pre-publish-checklist.md`
-- [ ] Verify GA4 (`G-EJJJHWZFQQ`), HubSpot tracking (`51915935`), HubSpot form fields, and pre-filled Calendly embeds
+- [ ] Verify GA4 (`G-EJJJHWZFQQ`), HubSpot tracking (`51915935`), HubSpot form fields, and confirmed Calendly routing
 - [ ] Brief Sales (Shayne, Zhai, Aica) with 1-page talking points and approved objection responses
 - [ ] Export any PDF/visual deliverables directly to SharePoint (`AI_Marketing_Outputs/...`) with `.sharepoint.md` stubs
-- [ ] Obtain explicit Renata / Shayne approval on all outbound drafts (notify via Microsoft Teams)
+- [ ] Obtain explicit Renata (CMO) approval on all outbound drafts (+ Shayne sign-off for Shayne founder-voice posts or Sales handoff; notify via Microsoft Teams)
 
 ## Launch Week: Execution
 

@@ -51,7 +51,11 @@ def find_gtm_brain() -> Path | None:
 
 
 def load_compliance_registry(gtm_brain: Path | None = None) -> dict[str, dict]:
-    """Load compliance status by domain from market-intelligence/*/sources.json."""
+    """Load compliance status by domain from market-intelligence/*/sources.json.
+
+    Supports both schema v2 dicts ({"schema_version": 2, "sources": [{"sources": [{"url": ...}]}]})
+    and legacy flat lists ([{"sources": ["https://..."]}]).
+    """
     registry: dict[str, dict] = {
         d: {"status": "excluded", "source": "default-exclusion"} for d in DEFAULT_EXCLUDED_DOMAINS
     }
@@ -64,15 +68,26 @@ def load_compliance_registry(gtm_brain: Path | None = None) -> dict[str, dict]:
         if not src_file.is_file():
             continue
         try:
-            entries = json.loads(src_file.read_text(encoding="utf-8"))
+            raw = json.loads(src_file.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError):
+            continue
+        if isinstance(raw, dict):
+            entries = raw.get("sources")
+        elif isinstance(raw, list):
+            entries = raw
+        else:
             continue
         if not isinstance(entries, list):
             continue
         for entry in entries:
+            if not isinstance(entry, dict):
+                continue
             status = (entry.get("status") or "").lower()
             decision = entry.get("compliance_decision") or ""
-            for src_url in entry.get("sources") or []:
+            for src_item in entry.get("sources") or []:
+                src_url = src_item.get("url") if isinstance(src_item, dict) else src_item
+                if not isinstance(src_url, str) or not src_url.strip():
+                    continue
                 dom = urlparse(src_url).netloc.lower().replace("www.", "")
                 if dom:
                     registry[dom] = {

@@ -65,6 +65,7 @@ class RepoIntegrityTests(unittest.TestCase):
             self.assertRegex(fm, rf"(?m)^name:\s*{re.escape(name)}\s*$")
             self.assertRegex(fm, r"(?m)^description:\s*.+$")
             self.assertNotIn("/Users/", text, f"Hardcoded macOS user path in {skill_md}")
+            self.assertNotIn("/tmp/jengai", text, f"Hardcoded POSIX /tmp file path in {skill_md}")
             self.assertNotRegex(text, r"/market\s+[a-z]", f"Legacy /market command reference in {skill_md}")
 
     def test_expected_agents_and_frontmatter(self):
@@ -84,6 +85,7 @@ class RepoIntegrityTests(unittest.TestCase):
             self.assertRegex(fm, r"(?m)^description:\s*.+$")
             self.assertRegex(fm, r"(?m)^tools:\s*.+$")
             self.assertNotIn("/Users/", text, f"Hardcoded macOS user path in {agent_md}")
+            self.assertNotIn("/tmp/extracted", text, f"Hardcoded POSIX /tmp file path in {agent_md}")
 
     def test_templates_pass_jengai_copy_validator(self):
         templates_dir = ROOT / "templates"
